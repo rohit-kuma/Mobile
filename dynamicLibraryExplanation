@@ -1,0 +1,44 @@
+
+
+
+What is a DLL?
+Dynamic Link Libraries (DLL)s are like EXEs but they are not directly executable. They are similar to .so files in Linux/Unix. That is to say, DLLs are MS's implementation of shared libraries. 
+DLLs are so much like an EXE that the file format itself is the same. Both EXE and DLLs are based on the Portable Executable (PE) file format. DLLs can also contain COM components and .NET libraries.
+What does a DLL contain?
+A DLL contains functions, classes, variables, UIs and resources (such as icons, images, files, ...) that an EXE, or other DLL uses.
+Types of libraries:
+On virtually all operating systems, there are 2 types of libraries. Static libraries and dynamic libraries. In windows the file extensions are as follows: Static libraries (.lib) and dynamic libraries (.dll). The main difference is that static libraries are linked to the executable at compile time; whereas dynamic linked libraries are not linked until run-time.
+More on static and dynamic libraries:
+You don't normally see static libraries though on your computer, because a static library is embedded directly inside of a module (EXE or DLL). A dynamic library is a stand-alone file. 
+A DLL can be changed at any time and is only loaded at runtime when an EXE explicitly loads the DLL. A static library cannot be changed once it is compiled within the EXE. A DLL can be updated individually without updating the EXE itself.
+Loading a DLL:
+A program loads a DLL at startup, via the Win32 API LoadLibrary, or when it is a dependency of another DLL. A program uses the GetProcAddress to load a function or LoadResource to load a resource.
+
+
+
+
+
+
+
+What is a DLL?
+DLL files are binary files that can contain executable code and resources like images, etc. Unlike applications, these cannot be directly executed, but an application will load them as and when they are required (or all at once during startup).
+Are they important?
+Most applications will load the DLL files they require at startup. If any of these are not found the system will not be able to start the process at all.
+DLL files might require other DLL files
+In the same way that an application requires a DLL file, a DLL file might be dependent on other DLL files itself. If one of these DLL files in the chain of dependency is not found, the application will not load. This is debugged easily using any dependency walker tools, like Dependency Walker.
+There are so many of them in the system folders
+Most of the system functionality is exposed to a user program in the form of DLL files as they are a standard form of sharing code / resources. Each functionality is kept separately in different DLL files so that only the required DLL files will be loaded and thus reduce the memory constraints on the system.
+Installed applications also use DLL files
+DLL files also becomes a form of separating functionalities physically as explained above. Good applications also try to not load the DLL files until they are absolutely required, which reduces the memory requirements. This too causes applications to ship with a lot of DLL files.
+DLL Hell
+However, at times system upgrades often breaks other programs when there is a version mismatch between the shared DLL files and the program that requires them. System checkpoints and DLL cache, etc. have been the initiatives from M$ to solve this problem. The .NET platform might not face this issue at all.
+How do we know what's inside a DLL file?
+You have to use an external tool like DUMPBIN or Dependency Walker which will not only show what publicly visible functions (known as exports) are contained inside the DLL files and also what other DLL files it requires and which exports from those DLL files this DLL file is dependent upon.
+Let’s say you are making an executable that uses some functions found in a library.
+If the library you are using is static, the linker will copy the object code for these functions directly from the library and insert them into the executable.
+Now if this executable is run it has every thing it needs, so the executable loader just loads it into memory and runs it.
+If the library is dynamic the linker will not insert object code but rather it will insert a stub which basically says this function is located in this DLL at this location.
+Now if this executable is run, bits of the executable are missing (i.e the stubs) so the loader goes through the executable fixing up the missing stubs. Only after all the stubs have been resolved will the executable be allowed to run.
+To see this in action delete or rename the DLL and watch how the loader will report a missing DLL error when you try to run the executable.
+Hence the name Dynamic Link Library, parts of the linking process is being done dynamically at run time by the executable loader.
+One a final note, if you don't link to the DLL then no stubs will be inserted by the linker, but Windows still provides the GetProcAddress API that allows you to load an execute the DLL function entry point long after the executable has started.
